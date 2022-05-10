@@ -8,7 +8,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "prisma:migrate": "prisma migrate dev --preview-feature",
+    "prisma:format": "prisma format"
   },
   "nodemonConfig": {
     "watch": [
@@ -19,15 +21,23 @@
     "ext": "ts, json, env",
     "exec": "ts-node --transpile-only index.ts"
   },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "@types/node": "^17.0.31",
     "nodemon": "^2.0.16",
     "prettier": "^2.6.2",
+    "prisma": "^3.13.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "@prisma/client": "^3.13.0",
     "dotenv": "^16.0.0",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "fido2-lib": "^2.8.3",
+    "joi": "^17.6.0"
   }
 }

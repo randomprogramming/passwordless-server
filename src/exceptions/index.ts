@@ -11,3 +11,10 @@ export class EnvVariableException extends BaseError {
     super(`Error with env variable: '${envVariableName}': ${error}`);
   }
 }
+
+// Should only be used when validation of some input data fails
+export class ValidationException extends BaseError {
+  constructor(message: string) {
+    super(message);
+  }
+}
