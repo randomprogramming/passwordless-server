@@ -6,6 +6,8 @@ import Route from "./Route";
 import Dao from "../dao";
 import ServerResponse from "../constants/ServerResponse";
 import { validateEmailBody } from "../validators";
+import { NullData, ValidationException } from "../exceptions";
+import { isNonEmptyString } from "../validators/helpers";
 
 class AttestationRoutes extends Route {
   private fido: Fido2Lib;
@@ -18,6 +20,7 @@ class AttestationRoutes extends Route {
     this.dao = dao;
 
     this.router.post("/begin", this.beginAttestation);
+    this.router.post("/complete", this.completeAttestation);
   }
 
   private beginAttestation = async (
@@ -47,6 +50,60 @@ class AttestationRoutes extends Route {
       });
 
       return res.status(ServerResponse.Created).send(encodedOptions);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  private completeAttestation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { accountId, credentials } = req.body;
+
+      if (!accountId || !credentials) {
+        throw new ValidationException("AccountId or Result missing.");
+      }
+
+      const account = await this.dao.findAccountById(accountId);
+      if (!account || !account.attestationChallenge) {
+        throw new NullData(
+          "Account with the specified ID was not found or is missing the challenge."
+        );
+      }
+
+      let publicKey: any;
+      try {
+        const attestationResult = {
+          ...credentials,
+          rawId: B64Helper.b64tab(credentials.rawId),
+          attestationObject: B64Helper.b64tab(credentials.attestationObject),
+        };
+        // TODO: Found out what origin and factor are
+        const response = await this.fido.attestationResult(attestationResult, {
+          factor: "either",
+          challenge: account.attestationChallenge,
+          origin: req.headers["origin"] || "http://localhost:3000",
+        });
+        publicKey = response.authnrData.get("credentialPublicKeyPem");
+      } catch (err) {
+        console.error("Failed to validate challenge:");
+        console.log(err);
+        return res
+          .status(ServerResponse.NotAcceptable)
+          .json({ message: "Failed to validate challenge." });
+      }
+
+      if (!isNonEmptyString(publicKey)) {
+        throw new NullData("Generated public key is invalid.");
+      }
+      await this.dao.updateAccountById(accountId, {
+        credentialPublicKey: publicKey,
+      });
+
+      return res.status(ServerResponse.OK).send();
     } catch (err) {
       next(err);
     }

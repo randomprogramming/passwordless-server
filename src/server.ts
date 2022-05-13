@@ -6,7 +6,7 @@ import { Fido2Lib } from "fido2-lib";
 import AttestationRoutes from "./routes/Attestation";
 import AssertionRoutes from "./routes/Assertion";
 import Dao from "./dao";
-import { ValidationException } from "./exceptions";
+import { NullData, ValidationException } from "./exceptions";
 import ServerResponse from "./constants/ServerResponse";
 import cors from "cors";
 
@@ -64,6 +64,11 @@ class Server {
           return res
             .status(ServerResponse.BadRequest)
             .json({ message: "Error when validating input data" });
+        }
+        if (err instanceof NullData) {
+          return res
+            .status(ServerResponse.BadRequest)
+            .json({ message: "Some required data was missing" });
         }
 
         return res

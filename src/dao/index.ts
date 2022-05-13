@@ -23,6 +23,12 @@ class Dao {
     });
   }
 
+  public async findAccountById(id: string) {
+    return await this.prisma.account.findFirst({
+      where: { id },
+    });
+  }
+
   public async updateAccountById(id: string, data: IAccountUpdateData) {
     return await this.prisma.account.update({
       where: {

@@ -6,8 +6,7 @@ class B64Helper {
 
   // B64 to ArrayBuffer
   public static b64tab(b64: string): ArrayBuffer {
-    // return Buffer.from(b64, "base64"); TODO: Test if this works
-    throw new Error("Not impolemented");
+    return new Uint8Array(Buffer.from(b64, "base64")).buffer;
   }
 }
 
