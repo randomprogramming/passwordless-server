@@ -79,7 +79,6 @@ class AttestationRoutes extends Route {
         const attestationResult = {
           ...credentials,
           rawId: B64Helper.b64tab(credentials.rawId),
-          attestationObject: B64Helper.b64tab(credentials.attestationObject),
         };
         // TODO: Found out what origin and factor are
         const response = await this.fido.attestationResult(attestationResult, {
