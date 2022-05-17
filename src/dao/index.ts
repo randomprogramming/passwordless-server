@@ -37,6 +37,25 @@ class Dao {
       data,
     });
   }
+
+  public async findAccountByEmail(email: string) {
+    // TODO: In the future email wont be a unique field, so replace this
+    return await this.prisma.account.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  public async updateAccountByEmail(email: string, data: IAccountUpdateData) {
+    // TODO: In the future email wont be a unique field, so replace this
+    return await this.prisma.account.update({
+      where: {
+        email,
+      },
+      data,
+    });
+  }
 }
 
 export default Dao;

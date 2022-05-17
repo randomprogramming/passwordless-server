@@ -29,9 +29,8 @@ class AttestationRoutes extends Route {
     next: NextFunction
   ) => {
     try {
-      // TODO: Make sure req.body.email is unique before inserting
-      const data = validateEmailBody(req.body);
-      const account = await this.dao.createAccount(data.email);
+      const { email } = validateEmailBody(req.body);
+      const account = await this.dao.createAccount(email);
       const registrationOptions = await this.fido.attestationOptions();
 
       registrationOptions.user = {
@@ -61,32 +60,34 @@ class AttestationRoutes extends Route {
     next: NextFunction
   ) => {
     try {
-      const { accountId, credentials } = req.body;
+      const { email, credentials } = req.body;
+      validateEmailBody({ email });
 
-      if (!accountId || !credentials) {
-        throw new ValidationException("AccountId or Result missing.");
+      if (!credentials) {
+        throw new ValidationException("Missing credentials.");
       }
 
-      const account = await this.dao.findAccountById(accountId);
+      const account = await this.dao.findAccountByEmail(email);
       if (!account || !account.attestationChallenge) {
         throw new NullData(
           "Account with the specified ID was not found or is missing the challenge."
         );
       }
 
-      let publicKey: any;
+      let publicKey: string, counter: number;
       try {
         const attestationResult = {
           ...credentials,
           rawId: B64Helper.b64tab(credentials.rawId),
         };
-        // TODO: Found out what origin and factor are
+        // TODO: Found out what origin and factor are(probably add a column for the customer to add their site location)
         const response = await this.fido.attestationResult(attestationResult, {
           factor: "either",
           challenge: account.attestationChallenge,
           origin: req.headers["origin"] || "http://localhost:3000",
         });
         publicKey = response.authnrData.get("credentialPublicKeyPem");
+        counter = response.authnrData.get("counter") || 0;
       } catch (err) {
         console.error("Failed to validate challenge:");
         console.log(err);
@@ -98,10 +99,10 @@ class AttestationRoutes extends Route {
       if (!isNonEmptyString(publicKey)) {
         throw new NullData("Generated public key is invalid.");
       }
-      await this.dao.updateAccountById(accountId, {
+      await this.dao.updateAccountById(account.id, {
         credentialPublicKey: publicKey,
+        authCounter: counter,
       });
-
       return res.status(ServerResponse.OK).send();
     } catch (err) {
       next(err);

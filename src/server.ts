@@ -47,7 +47,7 @@ class Server {
     );
     this.expressApp.use(
       this.ASSERTION_BASE_URL,
-      new AssertionRoutes(this.fidoLib).getRouter()
+      new AssertionRoutes(this.dao, this.fidoLib).getRouter()
     );
   }
 

@@ -11,5 +11,7 @@ model Account {
   id                   String  @id @default(uuid())
   email                String  @unique
   attestationChallenge String?
+  assertionChallenge   String?
   credentialPublicKey  String?
+  authCounter          Int     @default(0)
 }
