@@ -7,11 +7,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AttestationTypeEnum {
+  direct
+  indirect
+  none
+}
+
+enum UserVerificationTypeEnum {
+  required
+  preferred
+  discouraged
+}
+
+model FidoOptions {
+  id     String  @id @default(uuid())
+  client Client?
+
+  attestation                     AttestationTypeEnum       @default(direct)
+  // authenticatorAttachment can only be 'cross-platform' or 'platform'
+  // Unfortunately Prisma doesn't allow mapping enums to custom values, and they
+  // also don't allow '-' characters, which means that this must be a String and not a Enum
+  authenticatorAttachment         String?
+  authenticatorRequireResidentKey Boolean?
+  authenticatorUserVerification   UserVerificationTypeEnum?
+  challengeSize                   Int                       @default(64)
+  cryptoParams                    Int[]
+  rpIcon                          String?
+  rpId                            String?
+  rpName                          String?
+  timeout                         Int                       @default(60000)
+}
+
+model Client {
+  id            String      @id @default(uuid())
+  fidoOptions   FidoOptions @relation(fields: [fidoOptionsId], references: [id])
+  fidoOptionsId String      @unique
+  email         String      @unique
+  password      String?
+  roles         String[]
+  accounts      Account[]
+  createdAt     DateTime    @default(now())
+  publicApiKey  String      @unique
+  privateApiKey String      @unique
+}
+
 model Account {
-  id                   String  @id @default(uuid())
-  email                String  @unique
+  id                   String   @id @default(uuid())
+  email                String   @unique
   attestationChallenge String?
   assertionChallenge   String?
   credentialPublicKey  String?
-  authCounter          Int     @default(0)
+  authCounter          Int      @default(0)
+  client               Client   @relation(fields: [clientId], references: [id])
+  clientId             String
+  createdAt            DateTime @default(now())
 }
