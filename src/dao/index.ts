@@ -42,6 +42,28 @@ class Dao {
     });
   }
 
+  public async findClientByPrivateKey(privateKey: string) {
+    return await this.prisma.client.findUnique({
+      where: {
+        privateApiKey: privateKey,
+      },
+      include: {
+        fidoOptions: true,
+      },
+    });
+  }
+
+  public async findAccountByPublicKey(publicKey: string) {
+    return await this.prisma.client.findUnique({
+      where: {
+        publicApiKey: publicKey,
+      },
+      include: {
+        fidoOptions: true,
+      },
+    });
+  }
+
   public async findAccountByEmail(email: string) {
     // TODO: In the future email wont be a unique field, so replace this
     return await this.prisma.account.findUnique({
