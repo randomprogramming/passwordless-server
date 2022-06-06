@@ -31,6 +31,9 @@ class AttestationRoutes extends Route {
     try {
       const { email } = validateEmailBody(req.body);
       const account = await this.dao.createAccount(email);
+      if (!account) {
+        throw new NullData("Account is null after creation");
+      }
       const registrationOptions = await this.fido.attestationOptions();
 
       registrationOptions.user = {

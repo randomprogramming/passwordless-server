@@ -52,7 +52,7 @@ class AssertionRoutes extends Route {
   ) => {
     try {
       const { email, clientAssertionResponse } = req.body;
-      validateEmailBody(email);
+      validateEmailBody({ email });
 
       const account = await this.dao.findAccountByEmail(email);
       if (

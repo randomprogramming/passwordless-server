@@ -16,9 +16,13 @@ class Dao {
   }
 
   public async createAccount(email: string) {
+    // TODO: Fetch this client from the public or private key
+    const client = await this.prisma.client.findFirst({});
+    if (!client) return;
     return await this.prisma.account.create({
       data: {
         email,
+        clientId: client.id,
       },
     });
   }
