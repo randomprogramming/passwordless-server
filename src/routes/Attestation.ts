@@ -1,5 +1,6 @@
 // Registration
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
+import type { PublicKeyRequest } from "../middleware/RequestTypes";
 import { Fido2Lib } from "fido2-lib";
 import B64Helper from "../utils/B64Helper";
 import Route from "./Route";
@@ -8,6 +9,7 @@ import ServerResponse from "../constants/ServerResponse";
 import { validateEmailBody } from "../validators";
 import { NullData, ValidationException } from "../exceptions";
 import { isNonEmptyString } from "../validators/helpers";
+import { hasPublicKey } from "../middleware/keys";
 
 class AttestationRoutes extends Route {
   private fido: Fido2Lib;
@@ -19,12 +21,15 @@ class AttestationRoutes extends Route {
     this.fido = fido;
     this.dao = dao;
 
-    this.router.post("/begin", this.beginAttestation);
-    this.router.post("/complete", this.completeAttestation);
+    // TODO: Figure out why TS is complaining here
+    // @ts-ignore
+    this.router.post("/begin", [hasPublicKey], this.beginAttestation);
+    // @ts-ignore
+    this.router.post("/complete", [hasPublicKey], this.completeAttestation);
   }
 
   private beginAttestation = async (
-    req: Request,
+    req: PublicKeyRequest,
     res: Response,
     next: NextFunction
   ) => {
@@ -58,7 +63,7 @@ class AttestationRoutes extends Route {
   };
 
   private completeAttestation = async (
-    req: Request,
+    req: PublicKeyRequest,
     res: Response,
     next: NextFunction
   ) => {

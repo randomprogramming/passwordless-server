@@ -1,12 +1,12 @@
 import "dotenv/config";
-import express from "express";
 import type { Application } from "express";
+import express from "express";
 import EnvParser from "./utils/EnvParser";
 import { Fido2Lib } from "fido2-lib";
 import AttestationRoutes from "./routes/Attestation";
 import AssertionRoutes from "./routes/Assertion";
 import Dao from "./dao";
-import { NullData, ValidationException } from "./exceptions";
+import { ApiKeyError, NullData, ValidationException } from "./exceptions";
 import ServerResponse from "./constants/ServerResponse";
 import cors from "cors";
 
@@ -69,6 +69,11 @@ class Server {
           return res
             .status(ServerResponse.BadRequest)
             .json({ message: "Some required data was missing" });
+        }
+        if (err instanceof ApiKeyError) {
+          return res.status(ServerResponse.Unauthorized).json({
+            message: err.message,
+          });
         }
 
         return res

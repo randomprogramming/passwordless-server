@@ -16,3 +16,5 @@ export class EnvVariableException extends BaseError {
 export class ValidationException extends BaseError {}
 
 export class NullData extends BaseError {}
+
+export class ApiKeyError extends BaseError {}

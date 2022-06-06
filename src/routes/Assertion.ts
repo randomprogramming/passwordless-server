@@ -1,10 +1,15 @@
 // Login
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
 import type { Factor } from "fido2-lib";
+import type {
+  PrivateKeyRequest,
+  PublicKeyRequest,
+} from "../middleware/RequestTypes";
 import { Fido2Lib } from "fido2-lib";
 import ServerResponse from "../constants/ServerResponse";
 import Dao from "../dao";
 import { NullData } from "../exceptions";
+import { hasPrivateKey, hasPublicKey } from "../middleware/keys";
 import B64Helper from "../utils/B64Helper";
 import { validateEmailBody } from "../validators";
 import Route from "./Route";
@@ -19,12 +24,15 @@ class AssertionRoutes extends Route {
     this.dao = dao;
     this.fido = fido;
 
-    this.router.post("/begin", this.beginAssertion);
-    this.router.post("/complete", this.completeAssertion);
+    // TODO: Figure out why TS is complaining here
+    // @ts-ignore
+    this.router.post("/begin", [hasPublicKey], this.beginAssertion);
+    // @ts-ignore
+    this.router.post("/complete", [hasPrivateKey], this.completeAssertion);
   }
 
   private beginAssertion = async (
-    req: Request,
+    req: PublicKeyRequest,
     res: Response,
     next: NextFunction
   ) => {
@@ -46,7 +54,7 @@ class AssertionRoutes extends Route {
   };
 
   private completeAssertion = async (
-    req: Request,
+    req: PrivateKeyRequest,
     res: Response,
     next: NextFunction
   ) => {
