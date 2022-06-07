@@ -17,6 +17,7 @@ class Server {
 
   private expressApp: Application;
   private port: number;
+  private authPrivateKey: string;
 
   private fidoLib: Fido2Lib;
   private dao: Dao;
@@ -24,6 +25,7 @@ class Server {
   constructor() {
     this.expressApp = express();
     this.port = EnvParser.getNumber("PORT", 3003);
+    this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true);
 
     this.fidoLib = new Fido2Lib(); // TODO: Add all the options here later
     this.dao = new Dao();
@@ -47,7 +49,11 @@ class Server {
     );
     this.expressApp.use(
       this.ASSERTION_BASE_URL,
-      new AssertionRoutes(this.dao, this.fidoLib).getRouter()
+      new AssertionRoutes(
+        this.dao,
+        this.fidoLib,
+        this.authPrivateKey
+      ).getRouter()
     );
   }
 

@@ -22,6 +22,19 @@ class EnvParser {
       throw new EnvVariableException(env, "Variable expected to be numeric.");
     }
   }
+
+  public static getString(env: string, required: true): string;
+  public static getString(env: string, required: false): string | undefined;
+  public static getString(env: string, required = true) {
+    const val = process.env[env];
+    if (required && !val) {
+      throw new EnvVariableException(
+        env,
+        "Variable is required but was not found"
+      );
+    }
+    return val;
+  }
 }
 
 export default EnvParser;

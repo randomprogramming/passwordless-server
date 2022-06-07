@@ -13,16 +13,19 @@ import { hasPrivateKey, hasPublicKey } from "../middleware/keys";
 import B64Helper from "../utils/B64Helper";
 import { validateEmailBody } from "../validators";
 import Route from "./Route";
+import { privateEncrypt } from "crypto";
 
 class AssertionRoutes extends Route {
   private dao: Dao;
   private fido: Fido2Lib;
+  private authPrivateKey: string;
 
-  constructor(dao: Dao, fido: Fido2Lib) {
+  constructor(dao: Dao, fido: Fido2Lib, authPrivateKey: string) {
     super();
 
     this.dao = dao;
     this.fido = fido;
+    this.authPrivateKey = authPrivateKey;
 
     // TODO: Figure out why TS is complaining here
     // @ts-ignore
@@ -60,6 +63,7 @@ class AssertionRoutes extends Route {
   ) => {
     try {
       const { email, clientAssertionResponse } = req.body;
+
       validateEmailBody({ email });
 
       const account = await this.dao.findAccountByEmail(email);
@@ -98,7 +102,15 @@ class AssertionRoutes extends Route {
           .json({ message: "Login failed." });
       }
 
-      return res.status(ServerResponse.OK).json();
+      // Send a signed message back so that we can verify that the status hasn't been tampered with
+      // And the user is 100% authenticated
+      const signedMessage = privateEncrypt(
+        this.authPrivateKey,
+        Buffer.from(email)
+      ).toString("base64");
+      return res.status(ServerResponse.OK).json({
+        signedMessage,
+      });
     } catch (err) {
       next(err);
     }
