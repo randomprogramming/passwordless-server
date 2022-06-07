@@ -15,9 +15,8 @@ class Dao {
     await this.prisma.$disconnect();
   }
 
-  public async createAccount(email: string) {
-    // TODO: Fetch this client from the public or private key
-    const client = await this.prisma.client.findFirst({});
+  public async createAccount(email: string, publicKey: string) {
+    const client = await this.findClientByPublicKey(publicKey);
     if (!client) return;
     return await this.prisma.account.create({
       data: {
@@ -53,7 +52,7 @@ class Dao {
     });
   }
 
-  public async findAccountByPublicKey(publicKey: string) {
+  public async findClientByPublicKey(publicKey: string) {
     return await this.prisma.client.findUnique({
       where: {
         publicApiKey: publicKey,

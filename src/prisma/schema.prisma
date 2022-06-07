@@ -31,6 +31,7 @@ model FidoOptions {
   authenticatorRequireResidentKey Boolean?
   authenticatorUserVerification   UserVerificationTypeEnum?
   challengeSize                   Int                       @default(64)
+  // Prisma does not allow default values for arrays, so set this in code
   cryptoParams                    Int[]
   rpIcon                          String?
   rpId                            String?
@@ -38,6 +39,7 @@ model FidoOptions {
   timeout                         Int                       @default(60000)
 }
 
+// A client is a person who signs up at the head app. They recieve a private and public key which we use to recognize them.
 model Client {
   id            String      @id @default(uuid())
   fidoOptions   FidoOptions @relation(fields: [fidoOptionsId], references: [id])
@@ -51,6 +53,7 @@ model Client {
   privateApiKey String      @unique
 }
 
+// Accounts belong to clients. Accounts are the end users of our clients.
 model Account {
   id                   String   @id @default(uuid())
   email                String   @unique

@@ -1,7 +1,6 @@
 // Registration
 import type { Response, NextFunction } from "express";
 import type { PublicKeyRequest } from "../middleware/RequestTypes";
-import { Fido2Lib } from "fido2-lib";
 import B64Helper from "../utils/B64Helper";
 import Route from "./Route";
 import Dao from "../dao";
@@ -10,15 +9,16 @@ import { validateEmailBody } from "../validators";
 import { NullData, ValidationException } from "../exceptions";
 import { isNonEmptyString } from "../validators/helpers";
 import { hasPublicKey } from "../middleware/keys";
+import FidoFactory from "../FidoFactory";
 
 class AttestationRoutes extends Route {
-  private fido: Fido2Lib;
+  private fidoFactory: FidoFactory;
   private dao: Dao;
 
-  constructor(dao: Dao, fido: Fido2Lib) {
+  constructor(dao: Dao, fidoFactory: FidoFactory) {
     super();
 
-    this.fido = fido;
+    this.fidoFactory = fidoFactory;
     this.dao = dao;
 
     // TODO: Figure out why TS is complaining here
@@ -35,11 +35,12 @@ class AttestationRoutes extends Route {
   ) => {
     try {
       const { email } = validateEmailBody(req.body);
-      const account = await this.dao.createAccount(email);
+      const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
+      const account = await this.dao.createAccount(email, req.publicKey);
       if (!account) {
         throw new NullData("Account is null after creation");
       }
-      const registrationOptions = await this.fido.attestationOptions();
+      const registrationOptions = await fido.attestationOptions();
 
       registrationOptions.user = {
         id: account.id,
@@ -89,7 +90,8 @@ class AttestationRoutes extends Route {
           rawId: B64Helper.b64tab(credentials.rawId),
         };
         // TODO: Found out what origin and factor are(probably add a column for the customer to add their site location)
-        const response = await this.fido.attestationResult(attestationResult, {
+        const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
+        const response = await fido.attestationResult(attestationResult, {
           factor: "either",
           challenge: account.attestationChallenge,
           origin: req.headers["origin"] || "http://localhost:3000",

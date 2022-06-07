@@ -11,7 +11,7 @@ class FidoFactory {
     this.dao = dao;
   }
 
-  public static convertFidoAttachment = (
+  public static stringToFidoAttachment = (
     att: string | null
   ): Attachment | undefined => {
     if (!att) return undefined;
@@ -31,7 +31,7 @@ class FidoFactory {
       rpId: localFidoOptions.rpId || undefined,
       rpName: localFidoOptions.rpName || undefined,
       rpIcon: localFidoOptions.rpIcon || undefined,
-      authenticatorAttachment: FidoFactory.convertFidoAttachment(
+      authenticatorAttachment: FidoFactory.stringToFidoAttachment(
         localFidoOptions.authenticatorAttachment
       ),
       authenticatorRequireResidentKey:
@@ -54,7 +54,7 @@ class FidoFactory {
   };
 
   public fromPublicKey = async (publicKey: string): Promise<Fido2Lib> => {
-    const client = await this.dao.findAccountByPublicKey(publicKey);
+    const client = await this.dao.findClientByPublicKey(publicKey);
     if (!client) {
       throw new ApiKeyError("No client found with that API key.");
     }

@@ -2,13 +2,13 @@ import "dotenv/config";
 import type { Application } from "express";
 import express from "express";
 import EnvParser from "./utils/EnvParser";
-import { Fido2Lib } from "fido2-lib";
 import AttestationRoutes from "./routes/Attestation";
 import AssertionRoutes from "./routes/Assertion";
 import Dao from "./dao";
 import { ApiKeyError, NullData, ValidationException } from "./exceptions";
 import ServerResponse from "./constants/ServerResponse";
 import cors from "cors";
+import FidoFactory from "./FidoFactory";
 
 class Server {
   private readonly API_BASE_URL = "/api";
@@ -19,7 +19,7 @@ class Server {
   private port: number;
   private authPrivateKey: string;
 
-  private fidoLib: Fido2Lib;
+  private fidoFactory: FidoFactory;
   private dao: Dao;
 
   constructor() {
@@ -27,8 +27,8 @@ class Server {
     this.port = EnvParser.getNumber("PORT", 3003);
     this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true);
 
-    this.fidoLib = new Fido2Lib(); // TODO: Add all the options here later
     this.dao = new Dao();
+    this.fidoFactory = new FidoFactory(this.dao);
 
     this.setUpMiddleware();
     this.setUpRoutes();
@@ -45,13 +45,13 @@ class Server {
   private setUpRoutes() {
     this.expressApp.use(
       this.ATTESTATION_BASE_URL,
-      new AttestationRoutes(this.dao, this.fidoLib).getRouter()
+      new AttestationRoutes(this.dao, this.fidoFactory).getRouter()
     );
     this.expressApp.use(
       this.ASSERTION_BASE_URL,
       new AssertionRoutes(
         this.dao,
-        this.fidoLib,
+        this.fidoFactory,
         this.authPrivateKey
       ).getRouter()
     );

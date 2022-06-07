@@ -5,7 +5,6 @@ import type {
   PrivateKeyRequest,
   PublicKeyRequest,
 } from "../middleware/RequestTypes";
-import { Fido2Lib } from "fido2-lib";
 import ServerResponse from "../constants/ServerResponse";
 import Dao from "../dao";
 import { NullData } from "../exceptions";
@@ -14,17 +13,18 @@ import B64Helper from "../utils/B64Helper";
 import { validateEmailBody } from "../validators";
 import Route from "./Route";
 import { privateEncrypt } from "crypto";
+import FidoFactory from "../FidoFactory";
 
 class AssertionRoutes extends Route {
   private dao: Dao;
-  private fido: Fido2Lib;
+  private fidoFactory: FidoFactory;
   private authPrivateKey: string;
 
-  constructor(dao: Dao, fido: Fido2Lib, authPrivateKey: string) {
+  constructor(dao: Dao, fidoFactory: FidoFactory, authPrivateKey: string) {
     super();
 
     this.dao = dao;
-    this.fido = fido;
+    this.fidoFactory = fidoFactory;
     this.authPrivateKey = authPrivateKey;
 
     // TODO: Figure out why TS is complaining here
@@ -41,7 +41,8 @@ class AssertionRoutes extends Route {
   ) => {
     try {
       const { email } = validateEmailBody(req.body);
-      const assertionOptions = await this.fido.assertionOptions();
+      const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
+      const assertionOptions = await fido.assertionOptions();
       const encodedChallenge = B64Helper.abtb64(assertionOptions.challenge);
       const encodedOptions = {
         ...assertionOptions,
@@ -93,7 +94,8 @@ class AssertionRoutes extends Route {
           rawId: B64Helper.b64tab(clientAssertionResponse.rawId),
         };
 
-        await this.fido.assertionResult(decoded, assertionExpectations);
+        const fido = await this.fidoFactory.fromPrivateKey(req.privateKey);
+        await fido.assertionResult(decoded, assertionExpectations);
       } catch (err) {
         console.error("Login failed:");
         console.log(err);
