@@ -251,17 +251,19 @@ array-flatten@1.1.1:
   resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-1.1.1.tgz#9a5f699051b1e7073328f2a008968b64ea2955d2"
   integrity sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==
 
-asn1js@^2.1.1:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/asn1js/-/asn1js-2.4.0.tgz#9ca61dbdd7e4eb49b9ae95b36ab0615b77daff93"
-  integrity sha512-PvZC0FMyMut8aOnR2jAEGSkmRtHIUYPe9amUEnGjr9TdnUmsfoOkjrvUkOEU9mzpYBR1HyO9bF+8U1cLTMMHhQ==
-  dependencies:
-    pvutils "^1.1.3"
-
 asn1js@^3.0.1, asn1js@^3.0.2, asn1js@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/asn1js/-/asn1js-3.0.3.tgz#fbecdcced2c046552db0c63af284eccc494e0e74"
   integrity sha512-Oz62ld3K3n6KlRUr4iZSMbSFDDPCW84G1yX7b/gWK5a0Ka7ZYOmCxFpu91lFdQygkBi2Hgoft1/WxRqFrONqLA==
+  dependencies:
+    pvtsutils "^1.3.2"
+    pvutils "^1.1.3"
+    tslib "^2.4.0"
+
+asn1js@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/asn1js/-/asn1js-3.0.5.tgz#5ea36820443dbefb51cc7f88a2ebb5b462114f38"
+  integrity sha512-FVnvrKJwpt9LP2lAMl8qZswRNm3T4q9CON+bxldk2iwk3FFpuwhx2FfinyitizWHsVYyaY+y5JzDR0rCMV5yTQ==
   dependencies:
     pvtsutils "^1.3.2"
     pvutils "^1.1.3"
@@ -329,10 +331,10 @@ bytes@3.1.2:
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.2.tgz#8b0beeb98605adf1b128fa4386403c009e0221a5"
   integrity sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==
 
-bytestreamjs@^1.0.29:
-  version "1.0.29"
-  resolved "https://registry.yarnpkg.com/bytestreamjs/-/bytestreamjs-1.0.29.tgz#691f8ee8e5a150c61b925993a3eec0911ed17f1d"
-  integrity sha512-Mri3yqoo9YvdaSvD5OYl4Rdu9zCBJInW/Ez31sdlNY4ikMy//EvTTmidfLcs0e+NBvKVEpPzYvJAesjgMdjnZg==
+bytestreamjs@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bytestreamjs/-/bytestreamjs-2.0.0.tgz#ee1b3c348967d4c3ffa45911a64e51a1fd24fc3b"
+  integrity sha512-TyOlxeS92FcMOaJwAVq5gwqW0vfkWUv5W+ErwdbBzolcUN/9XYpCKWvCV21jjzXU550D9Wt4GgE8Pr1vVbR+wQ==
 
 cacheable-request@^6.0.0:
   version "6.1.0"
@@ -368,7 +370,7 @@ cbor-extract@^1.0.0:
     nan "^2.14.2"
     node-gyp-build "^4.2.3"
 
-cbor-x@^1.2.1:
+cbor-x@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/cbor-x/-/cbor-x-1.2.1.tgz#b621972873a91f9dfd2c905f8b008e4796972958"
   integrity sha512-vUgwxN/hCyMUuFsYaMTYhfpK0rwBpGho8CqCLEXSn3tGfaPL3fruB0lrZVGiq1v5EzTrqcrLVxJ2Ul9zqukhMw==
@@ -731,18 +733,18 @@ express@^4.18.1:
     utils-merge "1.0.1"
     vary "~1.1.2"
 
-fido2-lib@^3.1.4:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/fido2-lib/-/fido2-lib-3.1.5.tgz#f0fca5218ed15d605e044fa4a054b24101121a0d"
-  integrity sha512-J2brtzQyc+oR5vmB9zCYxDw+lnl/QMJkkel0JAJFaC/q+KwMtv6J3vm9P+5ShY0zwSf9cKqrvQxF+CoLA8cFSg==
+fido2-lib@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fido2-lib/-/fido2-lib-3.2.0.tgz#f95f3f2920161d3f49e19984e24b53935a7335d1"
+  integrity sha512-mg+19r2a9C08/Lwo7XbEOBRqWan1f413j/6orHojaGKbQFkFlfV1qQUruj1aQaX8hAXi1wD6lz7PddTi6c5NOw==
   dependencies:
     "@hexagon/base64" "^1.0.19"
     "@peculiar/webcrypto" "^1.4.0"
     asn1js "^3.0.2"
-    cbor-x "^1.2.1"
+    cbor-x "~1.2.1"
     jose "^4.7.0"
-    pkijs "^2.3.1"
-    tldts "^5.7.77"
+    pkijs "^3.0.3"
+    tldts "^5.7.79"
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -1222,14 +1224,16 @@ picomatch@^2.0.4, picomatch@^2.2.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
 
-pkijs@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/pkijs/-/pkijs-2.3.1.tgz#be2318142cef2b18fb58757686b03d7a46305c52"
-  integrity sha512-EmhJbottjyRxYLaJ+vELty/4taBL4CoPKAyYLel56gL1Z4sX8A4qKat1uHvSiD6sG8/Y3xLdENY+L15NvBr7Dw==
+pkijs@^3.0.3:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/pkijs/-/pkijs-3.0.5.tgz#64134f45a92633841b2200b2ece01931209a6c56"
+  integrity sha512-J6P30yzU7qSbuJIBaclwN93WbyoxjVlkYMgjQmE9wWkPUTHVu2cH6lkjWcIr2WAub5KH38BA1Eyeb4s9apUPTg==
   dependencies:
-    asn1js "^2.1.1"
-    bytestreamjs "^1.0.29"
+    asn1js "^3.0.5"
+    bytestreamjs "^2.0.0"
+    pvtsutils "^1.3.2"
     pvutils "^1.1.3"
+    tslib "^2.4.0"
 
 prepend-http@^2.0.0:
   version "2.0.0"
@@ -1470,17 +1474,17 @@ supports-color@^7.1.0:
   dependencies:
     has-flag "^4.0.0"
 
-tldts-core@^5.7.79:
-  version "5.7.79"
-  resolved "https://registry.yarnpkg.com/tldts-core/-/tldts-core-5.7.79.tgz#37be835a9e6f585678d0ac2f620bb80f263091c0"
-  integrity sha512-5UFUHNc9+AX/AcFG+fY7ryG3o9dIKd8BeYTtiQP3+CTTlLqIAsjH9VcRA7PNKlv5f3QMYM0Z7dgbfEnOWkXvPQ==
+tldts-core@^5.7.80:
+  version "5.7.80"
+  resolved "https://registry.yarnpkg.com/tldts-core/-/tldts-core-5.7.80.tgz#d58be63778adc93aca6850e637da138b3b7181a0"
+  integrity sha512-qGdm/usUZb6SwSxRolp4nGe+1xyPW7il4/xxuzFQxGvya43xb6S/+O/TJRTY3GCcdAmkwNtibnCeh9rJ3OD6sA==
 
-tldts@^5.7.77:
-  version "5.7.79"
-  resolved "https://registry.yarnpkg.com/tldts/-/tldts-5.7.79.tgz#bc2dedb6b0fd5aee8ebe3c010fe81290169bddbd"
-  integrity sha512-8Yg0bNMogGKji48emu8ZtywYzIQMwr74qakI7siFXhxGFs0Ykq13l5Jh2KeKIAee7nxCdfjV1C4w02A1pxteRA==
+tldts@^5.7.79:
+  version "5.7.80"
+  resolved "https://registry.yarnpkg.com/tldts/-/tldts-5.7.80.tgz#1da8f45ebc45fdc95e73810c03f8606b4cef23ea"
+  integrity sha512-f56ejwdv/mPUVE6seUJSv05FfblFDa2wZGJk8CWphYzJX1kVNEtalq8lQ4qB6TmYb9eNdFggNPMpKtNmhCzeTw==
   dependencies:
-    tldts-core "^5.7.79"
+    tldts-core "^5.7.80"
 
 to-readable-stream@^1.0.0:
   version "1.0.0"
