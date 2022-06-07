@@ -47,17 +47,11 @@ class FidoFactory {
 
   public fromPrivateKey = async (privateKey: string): Promise<Fido2Lib> => {
     const client = await this.dao.findClientByPrivateKey(privateKey);
-    if (!client) {
-      throw new ApiKeyError("No client found with that API key.");
-    }
     return this.createFidoInstance(client.fidoOptions);
   };
 
   public fromPublicKey = async (publicKey: string): Promise<Fido2Lib> => {
     const client = await this.dao.findClientByPublicKey(publicKey);
-    if (!client) {
-      throw new ApiKeyError("No client found with that API key.");
-    }
     return this.createFidoInstance(client.fidoOptions);
   };
 }

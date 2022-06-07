@@ -1,4 +1,5 @@
 import { PrismaClient, Account } from "@prisma/client";
+import { ApiKeyError } from "../exceptions";
 
 // Data that is allowed to be passed in when updating a row in the Account table
 // Don't allow the ID to be changed
@@ -17,7 +18,6 @@ class Dao {
 
   public async createAccount(email: string, publicKey: string) {
     const client = await this.findClientByPublicKey(publicKey);
-    if (!client) return;
     return await this.prisma.account.create({
       data: {
         email,
@@ -42,7 +42,7 @@ class Dao {
   }
 
   public async findClientByPrivateKey(privateKey: string) {
-    return await this.prisma.client.findUnique({
+    const client = await this.prisma.client.findUnique({
       where: {
         privateApiKey: privateKey,
       },
@@ -50,10 +50,14 @@ class Dao {
         fidoOptions: true,
       },
     });
+    if (!client) {
+      throw new ApiKeyError("Client with that API key was not found");
+    }
+    return client;
   }
 
   public async findClientByPublicKey(publicKey: string) {
-    return await this.prisma.client.findUnique({
+    const client = await this.prisma.client.findUnique({
       where: {
         publicApiKey: publicKey,
       },
@@ -61,6 +65,10 @@ class Dao {
         fidoOptions: true,
       },
     });
+    if (!client) {
+      throw new ApiKeyError("Client with that API key was not found");
+    }
+    return client;
   }
 
   public async findAccountByEmailAndPrivateKey(
@@ -68,7 +76,6 @@ class Dao {
     privateKey: string
   ) {
     const client = await this.findClientByPrivateKey(privateKey);
-    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
 
     return await this.prisma.account.findUnique({
       where: {
@@ -85,7 +92,6 @@ class Dao {
     publicKey: string
   ) {
     const client = await this.findClientByPublicKey(publicKey);
-    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
 
     return await this.prisma.account.findUnique({
       where: {
@@ -103,7 +109,6 @@ class Dao {
     data: IAccountUpdateData
   ) {
     const client = await this.findClientByPublicKey(publicKey);
-    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
 
     return await this.prisma.account.update({
       where: {
