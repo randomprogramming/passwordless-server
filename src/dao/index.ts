@@ -63,20 +63,54 @@ class Dao {
     });
   }
 
-  public async findAccountByEmail(email: string) {
-    // TODO: In the future email wont be a unique field, so replace this
+  public async findAccountByEmailAndPrivateKey(
+    email: string,
+    privateKey: string
+  ) {
+    const client = await this.findClientByPrivateKey(privateKey);
+    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
+
     return await this.prisma.account.findUnique({
       where: {
-        email,
+        email_clientId: {
+          email,
+          clientId: client.id,
+        },
       },
     });
   }
 
-  public async updateAccountByEmail(email: string, data: IAccountUpdateData) {
-    // TODO: In the future email wont be a unique field, so replace this
+  public async findAccountByEmailAndPublicKey(
+    email: string,
+    publicKey: string
+  ) {
+    const client = await this.findClientByPublicKey(publicKey);
+    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
+
+    return await this.prisma.account.findUnique({
+      where: {
+        email_clientId: {
+          email,
+          clientId: client.id,
+        },
+      },
+    });
+  }
+
+  public async updateAccountByEmailAndPublicKey(
+    email: string,
+    publicKey: string,
+    data: IAccountUpdateData
+  ) {
+    const client = await this.findClientByPublicKey(publicKey);
+    if (!client) return; // TODO: Remove this check and every other check. Just check once in findClientByPublicKey
+
     return await this.prisma.account.update({
       where: {
-        email,
+        email_clientId: {
+          email,
+          clientId: client.id,
+        },
       },
       data,
     });

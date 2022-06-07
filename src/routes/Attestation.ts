@@ -76,7 +76,10 @@ class AttestationRoutes extends Route {
         throw new ValidationException("Missing credentials.");
       }
 
-      const account = await this.dao.findAccountByEmail(email);
+      const account = await this.dao.findAccountByEmailAndPublicKey(
+        email,
+        req.publicKey
+      );
       if (!account || !account.attestationChallenge) {
         throw new NullData(
           "Account with the specified ID was not found or is missing the challenge."

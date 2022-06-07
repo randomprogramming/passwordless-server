@@ -56,7 +56,7 @@ model Client {
 // Accounts belong to clients. Accounts are the end users of our clients.
 model Account {
   id                   String   @id @default(uuid())
-  email                String   @unique
+  email                String
   attestationChallenge String?
   assertionChallenge   String?
   credentialPublicKey  String?
@@ -64,4 +64,6 @@ model Account {
   client               Client   @relation(fields: [clientId], references: [id])
   clientId             String
   createdAt            DateTime @default(now())
+
+  @@unique([email, clientId])
 }

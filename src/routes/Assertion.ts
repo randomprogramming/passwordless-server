@@ -48,7 +48,7 @@ class AssertionRoutes extends Route {
         ...assertionOptions,
         challenge: encodedChallenge,
       };
-      await this.dao.updateAccountByEmail(email, {
+      await this.dao.updateAccountByEmailAndPublicKey(email, req.publicKey, {
         assertionChallenge: encodedChallenge,
       });
       return res.status(ServerResponse.OK).json(encodedOptions);
@@ -67,7 +67,10 @@ class AssertionRoutes extends Route {
 
       validateEmailBody({ email });
 
-      const account = await this.dao.findAccountByEmail(email);
+      const account = await this.dao.findAccountByEmailAndPrivateKey(
+        email,
+        req.privateKey
+      );
       if (
         !account ||
         !account.assertionChallenge ||
