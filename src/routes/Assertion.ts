@@ -84,7 +84,7 @@ class AssertionRoutes extends Route {
       // TODO: Found out what origin and factor are(probably add a column for the customer to add their site location)
       const assertionExpectations = {
         challenge: account.assertionChallenge,
-        origin: "http://localhost:3000",
+        origin: req.headers["origin"] || "http://localhost:3000",
         factor: "either" as Factor,
         publicKey: account.credentialPublicKey,
         prevCounter: account.authCounter,
