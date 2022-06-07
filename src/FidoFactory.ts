@@ -1,7 +1,6 @@
 import type { Attachment, Fido2LibOptions } from "fido2-lib";
 import type { FidoOptions } from "@prisma/client";
 import { Fido2Lib } from "fido2-lib";
-import { ApiKeyError } from "./exceptions";
 import Dao from "./dao";
 
 class FidoFactory {
