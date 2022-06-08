@@ -11,7 +11,8 @@
     "dev": "nodemon",
     "prisma:migrate": "prisma migrate dev --preview-feature",
     "prisma:format": "prisma format",
-    "generate-key-pair": "npx ts-node src/cli/generateKeyPair.ts"
+    "generate-key-pair": "npx ts-node src/cli/generateKeyPair.ts",
+    "generate-main-client": "npx ts-node src/cli/generateMainClient.ts"
   },
   "nodemonConfig": {
     "watch": [
