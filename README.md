@@ -8,4 +8,4 @@
 - [ ] login with one time codes
 - [ ] tests
 - [ ] make sure that users can register if their registration fails once, currently it gives you an error that the entered email already exists
-- [ ] `authenticatorUserVerification: 'preferred',` - setting a value prevents warning in chrome
+- [x] `authenticatorUserVerification: 'preferred',` - setting a value prevents warning in chrome

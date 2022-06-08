@@ -23,20 +23,20 @@ model FidoOptions {
   id     String  @id @default(uuid())
   client Client?
 
-  attestation                     AttestationTypeEnum       @default(direct)
+  attestation                     AttestationTypeEnum      @default(direct)
   // authenticatorAttachment can only be 'cross-platform' or 'platform'
   // Unfortunately Prisma doesn't allow mapping enums to custom values, and they
   // also don't allow '-' characters, which means that this must be a String and not a Enum
   authenticatorAttachment         String?
   authenticatorRequireResidentKey Boolean?
-  authenticatorUserVerification   UserVerificationTypeEnum?
-  challengeSize                   Int                       @default(64)
+  authenticatorUserVerification   UserVerificationTypeEnum @default(preferred)
+  challengeSize                   Int                      @default(64)
   // Prisma does not allow default values for arrays, so set this in code
   cryptoParams                    Int[]
   rpIcon                          String?
   rpId                            String?
   rpName                          String?
-  timeout                         Int                       @default(60000)
+  timeout                         Int                      @default(60000)
 }
 
 // A client is a person who signs up at the head app. They recieve a private and public key which we use to recognize them.

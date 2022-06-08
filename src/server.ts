@@ -9,6 +9,7 @@ import { ApiKeyError, NullData, ValidationException } from "./exceptions";
 import ServerResponse from "./constants/ServerResponse";
 import cors from "cors";
 import FidoFactory from "./FidoFactory";
+import morgan from "morgan";
 
 class Server {
   private readonly API_BASE_URL = "/api";
@@ -40,6 +41,7 @@ class Server {
     this.expressApp.use(express.urlencoded({ extended: true }));
     // TODO: Add a env variable to select which cors domains to allow
     this.expressApp.use(cors());
+    this.expressApp.use(morgan("combined"));
   }
 
   private setUpRoutes() {
