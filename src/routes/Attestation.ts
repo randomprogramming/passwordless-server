@@ -36,7 +36,14 @@ class AttestationRoutes extends Route {
     try {
       const { email } = validateEmailBody(req.body);
       const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
-      const account = await this.dao.createAccount(email, req.publicKey);
+      // One account can have multiple devices registered
+      let account = await this.dao.findAccountByEmailAndPublicKey(
+        email,
+        req.publicKey
+      );
+      if (!account) {
+        account = await this.dao.createAccount(email, req.publicKey);
+      }
       if (!account) {
         throw new NullData("Account is null after creation");
       }

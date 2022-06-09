@@ -109,9 +109,23 @@ class AssertionRoutes extends Route {
         };
 
         const fido = await this.fidoFactory.fromPrivateKey(req.privateKey);
-        // TODO: Check if assertionResult return value it defined
-        // and onlf if it is, return 200 with the signedMessage
-        await fido.assertionResult(decoded, assertionExpectations);
+        const result = await fido.assertionResult(
+          decoded,
+          assertionExpectations
+        );
+
+        if (result) {
+          // Send a signed message back so that we can verify that the status hasn't been tampered with
+          // And the user is 100% authenticated
+          const signedMessage = privateEncrypt(
+            this.authPrivateKey,
+            Buffer.from(email)
+          ).toString("base64");
+
+          return res.status(ServerResponse.OK).json({
+            signedMessage,
+          });
+        }
       } catch (err) {
         console.error("Login failed:");
         console.log(err);
@@ -119,16 +133,6 @@ class AssertionRoutes extends Route {
           .status(ServerResponse.NotAcceptable)
           .json({ message: "Login failed." });
       }
-
-      // Send a signed message back so that we can verify that the status hasn't been tampered with
-      // And the user is 100% authenticated
-      const signedMessage = privateEncrypt(
-        this.authPrivateKey,
-        Buffer.from(email)
-      ).toString("base64");
-      return res.status(ServerResponse.OK).json({
-        signedMessage,
-      });
     } catch (err) {
       next(err);
     }
