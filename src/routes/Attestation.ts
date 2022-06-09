@@ -86,7 +86,6 @@ class AttestationRoutes extends Route {
         );
       }
 
-      let publicKey: string, counter: number;
       try {
         const attestationResult = {
           ...credentials,
@@ -99,8 +98,33 @@ class AttestationRoutes extends Route {
           challenge: account.attestationChallenge,
           origin: req.headers["origin"] || "http://localhost:3000",
         });
-        publicKey = response.authnrData.get("credentialPublicKeyPem");
-        counter = response.authnrData.get("counter") || 0;
+        const publicKey = response.authnrData.get("credentialPublicKeyPem");
+        const counter = (response.authnrData.get("counter") as number) || 0;
+        const credentialsId = credentials.id;
+        const transports = (credentials.transports as string[]) || []; //TODO: pass this from frontend
+        const authenticatorType = credentials.type;
+
+        if (!isNonEmptyString(publicKey)) {
+          throw new NullData("Generated public key is invalid.");
+        }
+        if (!isNonEmptyString(credentialsId)) {
+          throw new NullData("Credential ID is null.");
+        }
+        if (!isNonEmptyString(authenticatorType)) {
+          throw new NullData("Authenticator Type is null.");
+        }
+
+        await this.dao.createAuthenticator({
+          accountId: account.id,
+          authCounter: counter,
+          credentialId: credentialsId,
+          credentialPublicKey: publicKey,
+          enabled: false,
+          transports: transports,
+          type: authenticatorType,
+        });
+
+        return res.status(ServerResponse.OK).send();
       } catch (err) {
         console.error("Failed to validate challenge:");
         console.log(err);
@@ -108,15 +132,6 @@ class AttestationRoutes extends Route {
           .status(ServerResponse.NotAcceptable)
           .json({ message: "Failed to validate challenge." });
       }
-
-      if (!isNonEmptyString(publicKey)) {
-        throw new NullData("Generated public key is invalid.");
-      }
-      await this.dao.updateAccountById(account.id, {
-        credentialPublicKey: publicKey,
-        authCounter: counter,
-      });
-      return res.status(ServerResponse.OK).send();
     } catch (err) {
       next(err);
     }

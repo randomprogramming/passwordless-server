@@ -37,6 +37,7 @@ model FidoOptions {
   rpId                            String?
   rpName                          String?
   timeout                         Int                      @default(60000)
+  createdAt                       DateTime                 @default(now())
 }
 
 // A client is a person who signs up at the head app. They recieve a private and public key which we use to recognize them.
@@ -53,17 +54,36 @@ model Client {
   privateApiKey String      @unique
 }
 
+// TODO: Use these in allowedCredentials with assertionExpectations
+// This represents a FIDO capable device; something that the user can use to actually authenticate
+model Authenticator {
+  id                  String   @id @default(uuid())
+  credentialId        String
+  type                String
+  transports          String[] // TODO: Turn this into a ENUM
+  credentialPublicKey String
+  authCounter         Int      @default(0) // TODO: Probably need to increment this on sign in/sign up
+  // When a user tries to register a new device,
+  // send an email to them where they have to confirm that it was really them and set enabled to true
+  enabled             Boolean  @default(false)
+
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  createdAt DateTime @default(now())
+
+  @@unique([credentialId, accountId])
+}
+
 // Accounts belong to clients. Accounts are the end users of our clients.
 model Account {
-  id                   String   @id @default(uuid())
+  id                   String          @id @default(uuid())
   email                String
-  attestationChallenge String?
-  assertionChallenge   String?
-  credentialPublicKey  String?
-  authCounter          Int      @default(0)
-  client               Client   @relation(fields: [clientId], references: [id])
+  attestationChallenge String? // TODO: Delete this from database after using it
+  assertionChallenge   String? // TODO: Delete this from database after using it
+  client               Client          @relation(fields: [clientId], references: [id])
   clientId             String
-  createdAt            DateTime @default(now())
+  authenticators       Authenticator[]
+  createdAt            DateTime        @default(now())
 
   @@unique([email, clientId])
 }

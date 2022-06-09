@@ -1,4 +1,4 @@
-import { PrismaClient, Account } from "@prisma/client";
+import { PrismaClient, Account, Authenticator } from "@prisma/client";
 import { ApiKeyError } from "../exceptions";
 
 // Data that is allowed to be passed in when updating a row in the Account table
@@ -118,6 +118,27 @@ class Dao {
         },
       },
       data,
+    });
+  }
+
+  public async createAuthenticator(
+    data: Omit<Authenticator, "id" | "createdAt">
+  ) {
+    return await this.prisma.authenticator.create({
+      data,
+    });
+  }
+
+  public async findEnabledAccountAuthenticator(
+    accountId: string,
+    credentialId: string
+  ) {
+    return await this.prisma.authenticator.findFirst({
+      where: {
+        enabled: true,
+        accountId,
+        credentialId,
+      },
     });
   }
 }

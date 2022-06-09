@@ -14,6 +14,7 @@ import { validateEmailBody } from "../validators";
 import Route from "./Route";
 import { privateEncrypt } from "crypto";
 import FidoFactory from "../FidoFactory";
+import { isNonEmptyString } from "../validators/helpers";
 
 class AssertionRoutes extends Route {
   private dao: Dao;
@@ -67,18 +68,28 @@ class AssertionRoutes extends Route {
 
       validateEmailBody({ email });
 
+      const credentialId = clientAssertionResponse?.id;
+      if (!isNonEmptyString(credentialId)) {
+        throw new NullData("Credential ID is null.");
+      }
+
       const account = await this.dao.findAccountByEmailAndPrivateKey(
         email,
         req.privateKey
       );
-      if (
-        !account ||
-        !account.assertionChallenge ||
-        !account.credentialPublicKey
-      ) {
+      if (!account || !account.assertionChallenge) {
         throw new NullData(
           "Account with the specified ID was not found or is missing some data."
         );
+      }
+
+      const accountAuthenticator =
+        await this.dao.findEnabledAccountAuthenticator(
+          account.id,
+          credentialId
+        );
+      if (!accountAuthenticator) {
+        throw new NullData("Account authenticator not found.");
       }
 
       // TODO: Found out what origin and factor are(probably add a column for the customer to add their site location)
@@ -86,8 +97,8 @@ class AssertionRoutes extends Route {
         challenge: account.assertionChallenge,
         origin: req.headers["origin"] || "http://localhost:3000",
         factor: "either" as Factor,
-        publicKey: account.credentialPublicKey,
-        prevCounter: account.authCounter,
+        publicKey: accountAuthenticator.credentialPublicKey,
+        prevCounter: accountAuthenticator.authCounter,
         userHandle: Buffer.from(account.id).toString("base64"), // Must be b64
       };
 
@@ -98,6 +109,8 @@ class AssertionRoutes extends Route {
         };
 
         const fido = await this.fidoFactory.fromPrivateKey(req.privateKey);
+        // TODO: Check if assertionResult return value it defined
+        // and onlf if it is, return 200 with the signedMessage
         await fido.assertionResult(decoded, assertionExpectations);
       } catch (err) {
         console.error("Login failed:");
