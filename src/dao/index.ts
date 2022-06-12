@@ -144,6 +144,39 @@ class Dao {
       },
     });
   }
+
+  public async findAuthenticatorByToken(
+    accountId: string,
+    verificationToken: string
+  ) {
+    return await this.prisma.authenticator.findUnique({
+      where: {
+        verificationToken_accountId: {
+          accountId,
+          verificationToken,
+        },
+      },
+    });
+  }
+
+  public async verifyAuthenticator(
+    accountId: string,
+    verificationToken: string
+  ) {
+    return await this.prisma.authenticator.update({
+      where: {
+        verificationToken_accountId: {
+          accountId,
+          verificationToken,
+        },
+      },
+      data: {
+        enabled: true,
+        verificationToken: null,
+        verificationTokenValidUntil: null,
+      },
+    });
+  }
 }
 
 export default Dao;

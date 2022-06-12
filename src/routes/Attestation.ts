@@ -127,6 +127,9 @@ class AttestationRoutes extends Route {
           throw new NullData("Authenticator Type is null.");
         }
 
+        const verificationToken = randomBytes(
+          AttestationRoutes.AUTHENTICATOR_VERIFICATION_TOKEN_SIZE
+        ).toString("base64url");
         await this.dao.createAuthenticator({
           accountId: account.id,
           authCounter: counter,
@@ -135,12 +138,14 @@ class AttestationRoutes extends Route {
           enabled: false,
           transports: transports,
           type: authenticatorType,
-          verificationToken: randomBytes(
-            AttestationRoutes.AUTHENTICATOR_VERIFICATION_TOKEN_SIZE
-          ).toString("base64url"),
+          verificationToken,
         });
 
-        await this.mailClient.sendAuthenticatorAddedMail(account.email);
+        await this.mailClient.sendAuthenticatorAddedMail(
+          account.email,
+          account.id,
+          verificationToken
+        );
 
         return res.status(ServerResponse.OK).send();
       } catch (err) {

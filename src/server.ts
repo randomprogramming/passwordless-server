@@ -11,11 +11,13 @@ import cors from "cors";
 import FidoFactory from "./FidoFactory";
 import morgan from "morgan";
 import MailClient from "./mail/mail.client";
+import AuthenticatorRoutes from "./routes/Authenticator";
 
 class Server {
   private readonly API_BASE_URL = "/api";
   private readonly ATTESTATION_BASE_URL = this.API_BASE_URL + "/attestation";
   private readonly ASSERTION_BASE_URL = this.API_BASE_URL + "/assertion";
+  private readonly AUTHENTICATOR_BASE_URL = this.API_BASE_URL + "/authenticator";
 
   // Initialized by this class
   private expressApp: Application;
@@ -29,6 +31,7 @@ class Server {
   private mailHost: string;
   private mailUser: string;
   private mailPass: string;
+  private serverBaseUrl: string;
 
   // Dependecies for injection
   private dao: Dao;
@@ -46,17 +49,23 @@ class Server {
     this.mailHost = EnvParser.getString("MAILER_HOST", true);
     this.mailUser = EnvParser.getString("MAILER_AUTH_USER", true);
     this.mailPass = EnvParser.getString("MAILER_AUTH_PASSWORD", true);
+    this.serverBaseUrl = EnvParser.getString("SERVER_BASE_URL", true);
 
     this.dao = new Dao();
     this.fidoFactory = new FidoFactory(this.dao);
-    this.mailClient = new MailClient(this.mailerType, this.mailFrom, {
-      port: this.mailPort,
-      host: this.mailHost,
-      auth: {
-        user: this.mailUser,
-        pass: this.mailPass,
+    this.mailClient = new MailClient(
+      this.mailerType,
+      this.mailFrom,
+      {
+        port: this.mailPort,
+        host: this.mailHost,
+        auth: {
+          user: this.mailUser,
+          pass: this.mailPass,
+        },
       },
-    });
+      this.serverBaseUrl
+    );
 
     this.setUpMiddleware();
     this.setUpRoutes();
@@ -74,30 +83,18 @@ class Server {
   private setUpRoutes() {
     this.expressApp.use(
       this.ATTESTATION_BASE_URL,
-      new AttestationRoutes(
-        this.dao,
-        this.fidoFactory,
-        this.mailClient
-      ).getRouter()
+      new AttestationRoutes(this.dao, this.fidoFactory, this.mailClient).getRouter()
     );
     this.expressApp.use(
       this.ASSERTION_BASE_URL,
-      new AssertionRoutes(
-        this.dao,
-        this.fidoFactory,
-        this.authPrivateKey
-      ).getRouter()
+      new AssertionRoutes(this.dao, this.fidoFactory, this.authPrivateKey).getRouter()
     );
+    this.expressApp.use(this.AUTHENTICATOR_BASE_URL, new AuthenticatorRoutes(this.dao).getRouter());
   }
 
   private setUpErrorHandling() {
     this.expressApp.use(
-      (
-        err: Error,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
+      (err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
         console.log(err);
         if (err instanceof ValidationException) {
           return res

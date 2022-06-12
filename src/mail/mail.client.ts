@@ -15,13 +15,16 @@ function isMailerType(str: string | undefined): str is MailerType {
 class MailClient {
   private mailFrom: string;
   private mailer: Mailer;
+  private serverBaseUrl: string;
 
   constructor(
     mailerType: string | undefined,
     mailFrom: string,
-    transporterData: MailerTransporterData
+    transporterData: MailerTransporterData,
+    serverBaseUrl: string
   ) {
     this.mailFrom = mailFrom;
+    this.serverBaseUrl = serverBaseUrl;
 
     if (isMailerType(mailerType)) {
       switch (mailerType) {
@@ -42,12 +45,18 @@ class MailClient {
     }
   }
 
-  public sendAuthenticatorAddedMail = async (to: string) => {
+  public sendAuthenticatorAddedMail = async (
+    to: string,
+    accountId: string,
+    token: string
+  ) => {
     await this.mailer.send({
       from: this.mailFrom,
       to,
       subject: "New Authenticator Device Added",
-      text: "You have added a new authenticator device.",
+      text: `You have added a new authenticator device.
+      Activate your new device by clicking the following link: ${this.serverBaseUrl}/api/authenticator/verify/${accountId}/${token} .
+      \nThis link is only valid for one hour.`,
     });
   };
 }

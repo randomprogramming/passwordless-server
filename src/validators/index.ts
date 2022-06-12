@@ -11,3 +11,17 @@ export function validateEmailBody(data: any) {
     new ValidationException("Validation exception on email")
   );
 }
+
+const verifyAuthenticatorParams = joi.object({
+  accountId: joi.string().min(1).required(),
+  token: joi.string().min(1).required(),
+});
+export function validateVerifyAuthenticatorParams(data: any) {
+  return joi.attempt(
+    data,
+    verifyAuthenticatorParams,
+    new ValidationException(
+      "Some params were missing when trying to verify authenticator"
+    )
+  );
+}
