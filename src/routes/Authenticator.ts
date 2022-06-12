@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
+import path from "path";
 import ServerResponse from "../constants/ServerResponse";
 import Dao from "../dao";
-import { NullData } from "../exceptions";
+import { NullData, ValidationException } from "../exceptions";
 import { validateVerifyAuthenticatorParams } from "../validators";
 import Route from "./Route";
 
@@ -33,14 +34,16 @@ class AuthenticatorRoutes extends Route {
 
       if (new Date() < new Date(authenticator.verificationTokenValidUntil)) {
         await this.dao.verifyAuthenticator(accountId, token);
-        return res.status(ServerResponse.OK).send("Authenticator verified.");
+        return res.status(ServerResponse.OK).sendFile("AuthenticatorVerified.html", {
+          root: path.join(__dirname, "views"),
+        });
       } else {
-        return res.status(ServerResponse.NotAcceptable).send("This link has expired.");
+        throw new ValidationException("Authenticator token is no longer valid.");
       }
     } catch (err) {
-      return res
-        .status(ServerResponse.BadRequest)
-        .send("Failed to verify this authenticator, please try again later.");
+      return res.status(ServerResponse.BadRequest).sendFile("AuthenticatorFailed.html", {
+        root: path.join(__dirname, "views"),
+      });
     }
   };
 }
