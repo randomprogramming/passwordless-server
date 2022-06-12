@@ -74,7 +74,11 @@ class Server {
   private setUpRoutes() {
     this.expressApp.use(
       this.ATTESTATION_BASE_URL,
-      new AttestationRoutes(this.dao, this.fidoFactory).getRouter()
+      new AttestationRoutes(
+        this.dao,
+        this.fidoFactory,
+        this.mailClient
+      ).getRouter()
     );
     this.expressApp.use(
       this.ASSERTION_BASE_URL,
