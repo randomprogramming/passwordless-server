@@ -42,12 +42,12 @@ class MailClient {
     }
   }
 
-  public sendTestEmail = async (to: string) => {
+  public sendAuthenticatorAddedMail = async (to: string) => {
     await this.mailer.send({
       from: this.mailFrom,
       to,
-      subject: "Test Email Subject",
-      text: "This is a testing mail.",
+      subject: "New Authenticator Device Added",
+      text: "You have added a new authenticator device.",
     });
   };
 }

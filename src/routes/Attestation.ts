@@ -10,16 +10,19 @@ import { NullData, ValidationException } from "../exceptions";
 import { isNonEmptyString } from "../validators/helpers";
 import { hasPublicKey } from "../middleware/keys";
 import FidoFactory from "../FidoFactory";
+import MailClient from "../mail/mail.client";
 
 class AttestationRoutes extends Route {
   private fidoFactory: FidoFactory;
   private dao: Dao;
+  private mailClient: MailClient;
 
-  constructor(dao: Dao, fidoFactory: FidoFactory) {
+  constructor(dao: Dao, fidoFactory: FidoFactory, mailClient: MailClient) {
     super();
 
     this.fidoFactory = fidoFactory;
     this.dao = dao;
+    this.mailClient = mailClient;
 
     // TODO: Figure out why TS is complaining here
     // @ts-ignore
@@ -130,6 +133,8 @@ class AttestationRoutes extends Route {
           transports: transports,
           type: authenticatorType,
         });
+
+        await this.mailClient.sendAuthenticatorAddedMail(account.email);
 
         return res.status(ServerResponse.OK).send();
       } catch (err) {
