@@ -71,7 +71,12 @@ model Authenticator {
   accountId String
   createdAt DateTime @default(now())
 
+  verificationToken           String?
+  // FIXME: This sets an interval for 3 hours instead of 1 hour (GMT+2 + 1 hour interval)
+  verificationTokenValidUntil DateTime? @default(dbgenerated("NOW() + interval '1 hour'"))
+
   @@unique([credentialId, accountId])
+  @@unique([verificationToken, accountId])
 }
 
 // Accounts belong to clients. Accounts are the end users of our clients.

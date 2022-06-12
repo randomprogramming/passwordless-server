@@ -11,8 +11,11 @@ import { isNonEmptyString } from "../validators/helpers";
 import { hasPublicKey } from "../middleware/keys";
 import FidoFactory from "../FidoFactory";
 import MailClient from "../mail/mail.client";
+import { randomBytes } from "crypto";
 
 class AttestationRoutes extends Route {
+  private static readonly AUTHENTICATOR_VERIFICATION_TOKEN_SIZE = 64;
+
   private fidoFactory: FidoFactory;
   private dao: Dao;
   private mailClient: MailClient;
@@ -132,6 +135,9 @@ class AttestationRoutes extends Route {
           enabled: false,
           transports: transports,
           type: authenticatorType,
+          verificationToken: randomBytes(
+            AttestationRoutes.AUTHENTICATOR_VERIFICATION_TOKEN_SIZE
+          ).toString("base64url"),
         });
 
         await this.mailClient.sendAuthenticatorAddedMail(account.email);

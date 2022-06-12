@@ -3,7 +3,12 @@ import { ApiKeyError } from "../exceptions";
 
 // Data that is allowed to be passed in when updating a row in the Account table
 // Don't allow the ID to be changed
-export type IAccountUpdateData = Omit<Partial<Account>, "id">;
+export type IAccountUpdateData = Omit<Partial<Account>, "id" | "createdAt">;
+
+export type IAuthenticatorCreateData = Omit<
+  Authenticator,
+  "id" | "createdAt" | "verificationTokenValidUntil"
+>;
 
 class Dao {
   private prisma: PrismaClient;
@@ -121,9 +126,7 @@ class Dao {
     });
   }
 
-  public async createAuthenticator(
-    data: Omit<Authenticator, "id" | "createdAt">
-  ) {
+  public async createAuthenticator(data: IAuthenticatorCreateData) {
     return await this.prisma.authenticator.create({
       data,
     });
