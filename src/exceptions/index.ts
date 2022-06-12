@@ -18,3 +18,5 @@ export class ValidationException extends BaseError {}
 export class NullData extends BaseError {}
 
 export class ApiKeyError extends BaseError {}
+
+export class FailedToSendMail extends BaseError {}

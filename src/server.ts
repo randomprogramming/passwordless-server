@@ -10,26 +10,53 @@ import ServerResponse from "./constants/ServerResponse";
 import cors from "cors";
 import FidoFactory from "./FidoFactory";
 import morgan from "morgan";
+import MailClient from "./mail/mail.client";
 
 class Server {
   private readonly API_BASE_URL = "/api";
   private readonly ATTESTATION_BASE_URL = this.API_BASE_URL + "/attestation";
   private readonly ASSERTION_BASE_URL = this.API_BASE_URL + "/assertion";
 
+  // Initialized by this class
   private expressApp: Application;
+
+  // Read from ENV
   private port: number;
   private authPrivateKey: string;
+  private mailerType: string | undefined;
+  private mailFrom: string;
+  private mailPort: number;
+  private mailHost: string;
+  private mailUser: string;
+  private mailPass: string;
 
-  private fidoFactory: FidoFactory;
+  // Dependecies for injection
   private dao: Dao;
+  private fidoFactory: FidoFactory;
+  private mailClient: MailClient;
 
   constructor() {
     this.expressApp = express();
+
     this.port = EnvParser.getNumber("PORT", 3003);
     this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true);
+    this.mailerType = EnvParser.getString("MAILER_TYPE", false);
+    this.mailFrom = EnvParser.getString("MAILER_FROM", true);
+    this.mailPort = EnvParser.getNumber("MAILER_PORT", 587);
+    this.mailHost = EnvParser.getString("MAILER_HOST", true);
+    this.mailUser = EnvParser.getString("MAILER_AUTH_USER", true);
+    this.mailPass = EnvParser.getString("MAILER_AUTH_PASSWORD", true);
 
     this.dao = new Dao();
     this.fidoFactory = new FidoFactory(this.dao);
+    this.mailClient = new MailClient(this.mailerType, this.mailFrom, {
+      port: this.mailPort,
+      host: this.mailHost,
+      auth: {
+        user: this.mailUser,
+        pass: this.mailPass,
+      },
+    });
 
     this.setUpMiddleware();
     this.setUpRoutes();
