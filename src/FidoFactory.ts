@@ -10,18 +10,13 @@ class FidoFactory {
     this.dao = dao;
   }
 
-  public static stringToFidoAttachment = (
-    att: string | null
-  ): Attachment | undefined => {
+  public static stringToFidoAttachment = (att: string | null): Attachment | undefined => {
     if (!att) return undefined;
-    if (att === "cross-platform" || att === "platform")
-      return att as Attachment;
+    if (att === "cross-platform" || att === "platform") return att as Attachment;
     return undefined;
   };
 
-  public static toFido2LibOptions = (
-    localFidoOptions: FidoOptions
-  ): Fido2LibOptions => {
+  public static toFido2LibOptions = (localFidoOptions: FidoOptions): Fido2LibOptions => {
     // Fido2-lib expects the missing options to be undefined,
     // meanwhile our database returns null for those options,
     // so we have to cast nulls to undefineds
@@ -35,8 +30,7 @@ class FidoFactory {
       ),
       authenticatorRequireResidentKey:
         localFidoOptions.authenticatorRequireResidentKey || undefined,
-      authenticatorUserVerification:
-        localFidoOptions.authenticatorUserVerification || undefined,
+      authenticatorUserVerification: localFidoOptions.authenticatorUserVerification || undefined,
     };
   };
 

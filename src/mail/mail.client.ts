@@ -34,9 +34,7 @@ class MailClient {
       }
     } else {
       if (mailerType) {
-        console.warn(
-          `Mailer type '${mailerType}' was not recognized, using Empty Mailer.`
-        );
+        console.warn(`Mailer type '${mailerType}' was not recognized, using Empty Mailer.`);
       } else {
         console.warn("No mailer type supplied, using Empty Mailer.");
       }
@@ -45,11 +43,7 @@ class MailClient {
     }
   }
 
-  public sendAuthenticatorAddedMail = async (
-    to: string,
-    accountId: string,
-    token: string
-  ) => {
+  public sendAuthenticatorAddedMail = async (to: string, accountId: string, token: string) => {
     await this.mailer.send({
       from: this.mailFrom,
       to,

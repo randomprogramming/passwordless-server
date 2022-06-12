@@ -76,10 +76,7 @@ class Dao {
     return client;
   }
 
-  public async findAccountByEmailAndPrivateKey(
-    email: string,
-    privateKey: string
-  ) {
+  public async findAccountByEmailAndPrivateKey(email: string, privateKey: string) {
     const client = await this.findClientByPrivateKey(privateKey);
 
     return await this.prisma.account.findUnique({
@@ -92,10 +89,7 @@ class Dao {
     });
   }
 
-  public async findAccountByEmailAndPublicKey(
-    email: string,
-    publicKey: string
-  ) {
+  public async findAccountByEmailAndPublicKey(email: string, publicKey: string) {
     const client = await this.findClientByPublicKey(publicKey);
 
     return await this.prisma.account.findUnique({
@@ -132,10 +126,7 @@ class Dao {
     });
   }
 
-  public async findEnabledAccountAuthenticator(
-    accountId: string,
-    credentialId: string
-  ) {
+  public async findEnabledAccountAuthenticator(accountId: string, credentialId: string) {
     return await this.prisma.authenticator.findFirst({
       where: {
         enabled: true,
@@ -145,10 +136,7 @@ class Dao {
     });
   }
 
-  public async findAuthenticatorByToken(
-    accountId: string,
-    verificationToken: string
-  ) {
+  public async findAuthenticatorByToken(accountId: string, verificationToken: string) {
     return await this.prisma.authenticator.findUnique({
       where: {
         verificationToken_accountId: {
@@ -159,10 +147,7 @@ class Dao {
     });
   }
 
-  public async verifyAuthenticator(
-    accountId: string,
-    verificationToken: string
-  ) {
+  public async verifyAuthenticator(accountId: string, verificationToken: string) {
     return await this.prisma.authenticator.update({
       where: {
         verificationToken_accountId: {

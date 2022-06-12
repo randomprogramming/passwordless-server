@@ -1,10 +1,7 @@
 // Login
 import type { Response, NextFunction } from "express";
 import type { Factor } from "fido2-lib";
-import type {
-  PrivateKeyRequest,
-  PublicKeyRequest,
-} from "../middleware/RequestTypes";
+import type { PrivateKeyRequest, PublicKeyRequest } from "../middleware/RequestTypes";
 import ServerResponse from "../constants/ServerResponse";
 import Dao from "../dao";
 import { NullData } from "../exceptions";
@@ -35,11 +32,7 @@ class AssertionRoutes extends Route {
     this.router.post("/complete", [hasPrivateKey], this.completeAssertion);
   }
 
-  private beginAssertion = async (
-    req: PublicKeyRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
+  private beginAssertion = async (req: PublicKeyRequest, res: Response, next: NextFunction) => {
     try {
       const { email } = validateEmailBody(req.body);
       const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
@@ -58,11 +51,7 @@ class AssertionRoutes extends Route {
     }
   };
 
-  private completeAssertion = async (
-    req: PrivateKeyRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
+  private completeAssertion = async (req: PrivateKeyRequest, res: Response, next: NextFunction) => {
     try {
       const { email, clientAssertionResponse } = req.body;
 
@@ -73,21 +62,15 @@ class AssertionRoutes extends Route {
         throw new NullData("Credential ID is null.");
       }
 
-      const account = await this.dao.findAccountByEmailAndPrivateKey(
-        email,
-        req.privateKey
-      );
+      const account = await this.dao.findAccountByEmailAndPrivateKey(email, req.privateKey);
       if (!account || !account.assertionChallenge) {
-        throw new NullData(
-          "Account with the specified ID was not found or is missing some data."
-        );
+        throw new NullData("Account with the specified ID was not found or is missing some data.");
       }
 
-      const accountAuthenticator =
-        await this.dao.findEnabledAccountAuthenticator(
-          account.id,
-          credentialId
-        );
+      const accountAuthenticator = await this.dao.findEnabledAccountAuthenticator(
+        account.id,
+        credentialId
+      );
       if (!accountAuthenticator) {
         throw new NullData("Account authenticator not found.");
       }
@@ -109,18 +92,14 @@ class AssertionRoutes extends Route {
         };
 
         const fido = await this.fidoFactory.fromPrivateKey(req.privateKey);
-        const result = await fido.assertionResult(
-          decoded,
-          assertionExpectations
-        );
+        const result = await fido.assertionResult(decoded, assertionExpectations);
 
         if (result) {
           // Send a signed message back so that we can verify that the status hasn't been tampered with
           // And the user is 100% authenticated
-          const signedMessage = privateEncrypt(
-            this.authPrivateKey,
-            Buffer.from(email)
-          ).toString("base64");
+          const signedMessage = privateEncrypt(this.authPrivateKey, Buffer.from(email)).toString(
+            "base64"
+          );
 
           return res.status(ServerResponse.OK).json({
             signedMessage,
@@ -129,9 +108,7 @@ class AssertionRoutes extends Route {
       } catch (err) {
         console.error("Login failed:");
         console.log(err);
-        return res
-          .status(ServerResponse.NotAcceptable)
-          .json({ message: "Login failed." });
+        return res.status(ServerResponse.NotAcceptable).json({ message: "Login failed." });
       }
     } catch (err) {
       next(err);

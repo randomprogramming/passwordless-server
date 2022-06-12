@@ -34,19 +34,12 @@ class AttestationRoutes extends Route {
     this.router.post("/complete", [hasPublicKey], this.completeAttestation);
   }
 
-  private beginAttestation = async (
-    req: PublicKeyRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
+  private beginAttestation = async (req: PublicKeyRequest, res: Response, next: NextFunction) => {
     try {
       const { email } = validateEmailBody(req.body);
       const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
       // One account can have multiple devices registered
-      let account = await this.dao.findAccountByEmailAndPublicKey(
-        email,
-        req.publicKey
-      );
+      let account = await this.dao.findAccountByEmailAndPublicKey(email, req.publicKey);
       if (!account) {
         account = await this.dao.createAccount(email, req.publicKey);
       }
@@ -89,10 +82,7 @@ class AttestationRoutes extends Route {
         throw new ValidationException("Missing credentials.");
       }
 
-      const account = await this.dao.findAccountByEmailAndPublicKey(
-        email,
-        req.publicKey
-      );
+      const account = await this.dao.findAccountByEmailAndPublicKey(email, req.publicKey);
       if (!account || !account.attestationChallenge) {
         throw new NullData(
           "Account with the specified ID was not found or is missing the challenge."

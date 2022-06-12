@@ -20,8 +20,6 @@ export function validateVerifyAuthenticatorParams(data: any) {
   return joi.attempt(
     data,
     verifyAuthenticatorParams,
-    new ValidationException(
-      "Some params were missing when trying to verify authenticator"
-    )
+    new ValidationException("Some params were missing when trying to verify authenticator")
   );
 }

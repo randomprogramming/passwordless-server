@@ -6,11 +6,7 @@ const KEY_AUTH_PREFIX = "Basic ";
 
 function getKey(req: Request) {
   const authHeader = req.headers.authorization;
-  if (
-    !authHeader ||
-    authHeader.length === 0 ||
-    !authHeader.includes(KEY_AUTH_PREFIX)
-  ) {
+  if (!authHeader || authHeader.length === 0 || !authHeader.includes(KEY_AUTH_PREFIX)) {
     throw new ApiKeyError("Auth header missing.");
   }
   const key = authHeader.split(KEY_AUTH_PREFIX);
@@ -20,20 +16,12 @@ function getKey(req: Request) {
   return key[1];
 }
 
-export function hasPublicKey(
-  req: PublicKeyRequest,
-  res: Response,
-  next: NextFunction
-) {
+export function hasPublicKey(req: PublicKeyRequest, res: Response, next: NextFunction) {
   req.publicKey = getKey(req);
   next();
 }
 
-export function hasPrivateKey(
-  req: PrivateKeyRequest,
-  res: Response,
-  next: NextFunction
-) {
+export function hasPrivateKey(req: PrivateKeyRequest, res: Response, next: NextFunction) {
   req.privateKey = getKey(req);
   next();
 }

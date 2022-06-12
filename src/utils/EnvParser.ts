@@ -7,10 +7,7 @@ class EnvParser {
 
     if (!val) {
       if (!defaultValue) {
-        throw new EnvVariableException(
-          env,
-          "Variable not found, default not provided."
-        );
+        throw new EnvVariableException(env, "Variable not found, default not provided.");
       } else {
         return defaultValue;
       }
@@ -28,10 +25,7 @@ class EnvParser {
   public static getString(env: string, required = true) {
     const val = process.env[env];
     if (required && !val) {
-      throw new EnvVariableException(
-        env,
-        "Variable is required but was not found"
-      );
+      throw new EnvVariableException(env, "Variable is required but was not found");
     }
     return val;
   }

@@ -16,22 +16,13 @@ class AuthenticatorRoutes extends Route {
     this.router.get("/verify/:accountId/:token", this.verifyAuthenticator);
   }
 
-  private verifyAuthenticator = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  private verifyAuthenticator = async (req: Request, res: Response, next: NextFunction) => {
     // TODO: Make clients able to specify where to redirect user
     // Expose three options: 1. Authenticator verified, 2. Token expired, 3. Invalid token
     try {
-      const { accountId, token } = validateVerifyAuthenticatorParams(
-        req.params
-      );
+      const { accountId, token } = validateVerifyAuthenticatorParams(req.params);
 
-      const authenticator = await this.dao.findAuthenticatorByToken(
-        accountId,
-        token
-      );
+      const authenticator = await this.dao.findAuthenticatorByToken(accountId, token);
       if (
         !authenticator ||
         !authenticator.verificationToken ||
@@ -44,9 +35,7 @@ class AuthenticatorRoutes extends Route {
         await this.dao.verifyAuthenticator(accountId, token);
         return res.status(ServerResponse.OK).send("Authenticator verified.");
       } else {
-        return res
-          .status(ServerResponse.NotAcceptable)
-          .send("This link has expired.");
+        return res.status(ServerResponse.NotAcceptable).send("This link has expired.");
       }
     } catch (err) {
       return res
