@@ -1,7 +1,11 @@
 import type { MailerTransporterData } from "./mailers/Mailer";
+import type { TemplateDelegate } from "handlebars";
+import { compile } from "handlebars";
 import Mailer from "./mailers/Mailer";
 import EmptyMailer from "./mailers/empty.mailer";
 import MailtrapMailer from "./mailers/mailtrap.mailer";
+import fs from "fs";
+import path from "path";
 
 enum MailerType {
   mailtrap = "mailtrap",
@@ -16,6 +20,8 @@ class MailClient {
   private mailFrom: string;
   private mailer: Mailer;
   private serverBaseUrl: string;
+  // Templates which are loaded on initial server start into memory
+  private authenticatorAddedMailTemplate: TemplateDelegate;
 
   constructor(
     mailerType: string | undefined,
@@ -25,6 +31,7 @@ class MailClient {
   ) {
     this.mailFrom = mailFrom;
     this.serverBaseUrl = serverBaseUrl;
+    this.authenticatorAddedMailTemplate = MailClient.loadMailTemplate("authenticatorAddedMail.hbs");
 
     if (isMailerType(mailerType)) {
       switch (mailerType) {
@@ -43,14 +50,21 @@ class MailClient {
     }
   }
 
+  private static loadMailTemplate = (mailFileName: string) => {
+    const templatePath = path.join(__dirname, "views", mailFileName);
+    return compile(fs.readFileSync(templatePath).toString());
+  };
+
   public sendAuthenticatorAddedMail = async (to: string, accountId: string, token: string) => {
+    // TODO: Sending an email takes a lot of time, so maybe not awaiting it would be okay?
+    const url = `${this.serverBaseUrl}/api/authenticator/verify/${accountId}/${token}`;
     await this.mailer.send({
       from: this.mailFrom,
       to,
       subject: "New Authenticator Device Added",
-      text: `You have added a new authenticator device.
-      Activate your new device by clicking the following link: ${this.serverBaseUrl}/api/authenticator/verify/${accountId}/${token} .
-      \nThis link is only valid for one hour.`,
+      html: this.authenticatorAddedMailTemplate({
+        url,
+      }),
     });
   };
 }
