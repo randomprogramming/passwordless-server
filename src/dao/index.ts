@@ -162,6 +162,21 @@ class Dao {
       },
     });
   }
+
+  public async findClientForAccount(accountId: string) {
+    return (
+      (
+        await this.prisma.account.findUnique({
+          where: {
+            id: accountId,
+          },
+          include: {
+            client: true,
+          },
+        })
+      )?.client || null
+    );
+  }
 }
 
 export default Dao;

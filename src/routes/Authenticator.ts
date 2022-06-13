@@ -18,32 +18,45 @@ class AuthenticatorRoutes extends Route {
   }
 
   private verifyAuthenticator = async (req: Request, res: Response, next: NextFunction) => {
-    // TODO: Make clients able to specify where to redirect user
-    // Expose three options: 1. Authenticator verified, 2. Token expired, 3. Invalid token
+    let accountIdValidated: string | null = null;
     try {
       const { accountId, token } = validateVerifyAuthenticatorParams(req.params);
-
+      accountIdValidated = accountId;
       const authenticator = await this.dao.findAuthenticatorByToken(accountId, token);
-      if (
-        !authenticator ||
-        !authenticator.verificationToken ||
-        !authenticator.verificationTokenValidUntil
-      ) {
+      if (!authenticator?.verificationToken || !authenticator?.verificationTokenValidUntil) {
         throw new NullData("Authenticator with that token was not found.");
       }
 
       if (new Date() < new Date(authenticator.verificationTokenValidUntil)) {
+        const client = await this.dao.findClientForAccount(accountId);
+        if (!client) {
+          throw new NullData("Client was not found.");
+        }
         await this.dao.verifyAuthenticator(accountId, token);
-        return res.status(ServerResponse.OK).sendFile("AuthenticatorVerified.html", {
-          root: path.join(__dirname, "views"),
-        });
+        if (client.authenticatorAddedRedirectUrl) {
+          return res.redirect(client.authenticatorAddedRedirectUrl);
+        } else {
+          return res.status(ServerResponse.OK).sendFile("AuthenticatorVerified.html", {
+            root: path.join(__dirname, "views"),
+          });
+        }
       } else {
         throw new ValidationException("Authenticator token is no longer valid.");
       }
     } catch (err) {
-      return res.status(ServerResponse.BadRequest).sendFile("AuthenticatorFailed.html", {
-        root: path.join(__dirname, "views"),
-      });
+      if (!accountIdValidated) {
+        return res.status(ServerResponse.BadRequest).sendFile("AuthenticatorFailed.html", {
+          root: path.join(__dirname, "views"),
+        });
+      }
+      const client = await this.dao.findClientForAccount(accountIdValidated);
+      if (!client || !client.authenticatorFailedRedirectUrl) {
+        return res.status(ServerResponse.BadRequest).sendFile("AuthenticatorFailed.html", {
+          root: path.join(__dirname, "views"),
+        });
+      } else {
+        return res.redirect(client.authenticatorFailedRedirectUrl);
+      }
     }
   };
 }

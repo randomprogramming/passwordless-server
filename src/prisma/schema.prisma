@@ -42,16 +42,18 @@ model FidoOptions {
 
 // A client is a person who signs up at the head app. They recieve a private and public key which we use to recognize them.
 model Client {
-  id            String      @id @default(uuid())
-  fidoOptions   FidoOptions @relation(fields: [fidoOptionsId], references: [id])
-  fidoOptionsId String      @unique
-  email         String      @unique
-  password      String?
-  roles         String[]
-  accounts      Account[]
-  createdAt     DateTime    @default(now())
-  publicApiKey  String      @unique
-  privateApiKey String      @unique
+  id                             String      @id @default(uuid())
+  fidoOptions                    FidoOptions @relation(fields: [fidoOptionsId], references: [id])
+  fidoOptionsId                  String      @unique
+  email                          String      @unique
+  password                       String?
+  roles                          String[]
+  accounts                       Account[]
+  publicApiKey                   String      @unique
+  privateApiKey                  String      @unique
+  authenticatorAddedRedirectUrl  String?
+  authenticatorFailedRedirectUrl String?
+  createdAt                      DateTime    @default(now())
 }
 
 // TODO: Use these in allowedCredentials with assertionExpectations
