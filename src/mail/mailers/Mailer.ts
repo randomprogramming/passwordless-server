@@ -2,8 +2,6 @@ import type { Transporter } from "nodemailer";
 import { FailedToSendMail } from "../../exceptions";
 
 export interface MailerTransporterData {
-  host: string;
-  port: number;
   auth: {
     user: string;
     pass: string;

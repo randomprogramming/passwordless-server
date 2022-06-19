@@ -27,8 +27,6 @@ class Server {
   private authPrivateKey: string;
   private mailerType: string | undefined;
   private mailFrom: string;
-  private mailPort: number;
-  private mailHost: string;
   private mailUser: string;
   private mailPass: string;
   private serverBaseUrl: string;
@@ -45,8 +43,6 @@ class Server {
     this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true);
     this.mailerType = EnvParser.getString("MAILER_TYPE", false);
     this.mailFrom = EnvParser.getString("MAILER_FROM", true);
-    this.mailPort = EnvParser.getNumber("MAILER_PORT", 587);
-    this.mailHost = EnvParser.getString("MAILER_HOST", true);
     this.mailUser = EnvParser.getString("MAILER_AUTH_USER", true);
     this.mailPass = EnvParser.getString("MAILER_AUTH_PASSWORD", true);
     this.serverBaseUrl = EnvParser.getString("SERVER_BASE_URL", true);
@@ -57,8 +53,6 @@ class Server {
       this.mailerType,
       this.mailFrom,
       {
-        port: this.mailPort,
-        host: this.mailHost,
         auth: {
           user: this.mailUser,
           pass: this.mailPass,

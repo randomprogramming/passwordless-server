@@ -2,16 +2,17 @@ import type { MailerTransporterData } from "./Mailer";
 import Mailer from "./Mailer";
 import { createTransport } from "nodemailer";
 
-class MailtrapMailer extends Mailer {
+class TitanMailer extends Mailer {
   constructor(transporterData: MailerTransporterData) {
     super(
       createTransport({
         ...transporterData,
-        port: 587,
-        host: "smtp.mailtrap.io",
+        secure: true,
+        port: 465,
+        host: "smtp.titan.email",
       })
     );
   }
 }
 
-export default MailtrapMailer;
+export default TitanMailer;

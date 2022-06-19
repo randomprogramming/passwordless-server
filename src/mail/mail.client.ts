@@ -6,9 +6,11 @@ import EmptyMailer from "./mailers/empty.mailer";
 import MailtrapMailer from "./mailers/mailtrap.mailer";
 import fs from "fs";
 import path from "path";
+import TitanMailer from "./mailers/titan.mailer";
 
 enum MailerType {
   mailtrap = "mailtrap",
+  titan = "titan",
 }
 
 function isMailerType(str: string | undefined): str is MailerType {
@@ -38,6 +40,8 @@ class MailClient {
         case MailerType.mailtrap:
           this.mailer = new MailtrapMailer(transporterData);
           break;
+        case MailerType.titan:
+          this.mailer = new TitanMailer(transporterData);
       }
     } else {
       if (mailerType) {
