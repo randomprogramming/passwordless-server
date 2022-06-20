@@ -75,6 +75,9 @@ class Server {
   }
 
   private setUpRoutes() {
+    this.expressApp.get("/", (req, res) => {
+      return res.send("Health check");
+    });
     this.expressApp.use(
       this.ATTESTATION_BASE_URL,
       new AttestationRoutes(this.dao, this.fidoFactory, this.mailClient).getRouter()
