@@ -40,7 +40,7 @@ class Server {
     this.expressApp = express();
 
     this.port = EnvParser.getNumber("PORT", 3003);
-    this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true);
+    this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true).replace(/\\n/g, "\n");
     this.mailerType = EnvParser.getString("MAILER_TYPE", false);
     this.mailFrom = EnvParser.getString("MAILER_FROM", true);
     this.mailUser = EnvParser.getString("MAILER_AUTH_USER", true);
