@@ -12,6 +12,7 @@ import { hasPublicKey } from "../middleware/keys";
 import FidoFactory from "../FidoFactory";
 import MailClient from "../mail/mail.client";
 import { randomBytes } from "crypto";
+import getOrigin from "../utils/getOrigin";
 
 class AttestationRoutes extends Route {
   private static readonly AUTHENTICATOR_VERIFICATION_TOKEN_SIZE = 64;
@@ -94,12 +95,12 @@ class AttestationRoutes extends Route {
           ...credentials,
           rawId: B64Helper.b64tab(credentials.rawId),
         };
-        // TODO: Found out what origin and factor are(probably add a column for the customer to add their site location)
+        // TODO: Found out what factor is(probably add a column for the customer to add their site location)
         const fido = await this.fidoFactory.fromPublicKey(req.publicKey);
         const response = await fido.attestationResult(attestationResult, {
           factor: "either",
           challenge: account.attestationChallenge,
-          origin: req.headers["origin"] || "http://localhost:3000",
+          origin: getOrigin(req),
         });
         const publicKey = response.authnrData.get("credentialPublicKeyPem");
         const counter = (response.authnrData.get("counter") as number) || 0;
