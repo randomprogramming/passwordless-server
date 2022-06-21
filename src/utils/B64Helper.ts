@@ -9,6 +9,11 @@ class B64Helper {
     return new Uint8Array(Buffer.from(b64, "base64")).buffer;
   }
 
+  // Decode B64
+  public static db64(b64: string): string {
+    return Buffer.from(b64, "base64").toString();
+  }
+
   // B64 to URL safe B64
   public static b64tb64url(b64: string): string {
     return b64

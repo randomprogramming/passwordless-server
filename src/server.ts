@@ -12,6 +12,7 @@ import FidoFactory from "./FidoFactory";
 import morgan from "morgan";
 import MailClient from "./mail/mail.client";
 import AuthenticatorRoutes from "./routes/Authenticator";
+import B64Helper from "./utils/B64Helper";
 
 class Server {
   private readonly API_BASE_URL = "/api";
@@ -40,14 +41,14 @@ class Server {
     this.expressApp = express();
 
     this.port = EnvParser.getNumber("PORT", 3003);
-    this.authPrivateKey = EnvParser.getString("AUTH_PRIVATE_KEY", true).replace(/\\n/g, "\n");
+    this.authPrivateKey = B64Helper.db64(EnvParser.getString("AUTH_PRIVATE_KEY", true));
     this.mailerType = EnvParser.getString("MAILER_TYPE", false);
     this.mailFrom = EnvParser.getString("MAILER_FROM", true);
     this.mailUser = EnvParser.getString("MAILER_AUTH_USER", true);
     this.mailPass = EnvParser.getString("MAILER_AUTH_PASSWORD", true);
     this.serverBaseUrl = EnvParser.getString("SERVER_BASE_URL", true);
 
-    console.log(`Read from env:\nauthPrivateKey:${this.authPrivateKey}\n`);
+    console.log(`Read from env:\nport:${this.port}\nauthPrivateKey:${this.authPrivateKey}\n`);
 
     this.dao = new Dao();
     this.fidoFactory = new FidoFactory(this.dao);
