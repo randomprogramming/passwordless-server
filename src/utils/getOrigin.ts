@@ -8,6 +8,6 @@ export default function (req: Request) {
   } else {
     origin = "http://localhost:3000";
   }
-  console.log("Origin: ", origin);
+  console.log("Request Origin: ", origin);
   return origin;
 }

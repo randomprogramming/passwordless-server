@@ -12,7 +12,6 @@ import Route from "./Route";
 import { privateEncrypt } from "crypto";
 import FidoFactory from "../FidoFactory";
 import { isNonEmptyString } from "../validators/helpers";
-import getOrigin from "../utils/getOrigin";
 
 class AssertionRoutes extends Route {
   private dao: Dao;
@@ -76,10 +75,12 @@ class AssertionRoutes extends Route {
         throw new NullData("Account authenticator not found.");
       }
 
+      const expectedOrigin = await this.dao.findOriginByPrivateKey(req.privateKey);
+      console.log("Expected Origin: ", expectedOrigin);
       // TODO: Found out what factor is(probably add a column for the customer to add their site location)
       const assertionExpectations = {
         challenge: account.assertionChallenge,
-        origin: getOrigin(req),
+        origin: expectedOrigin || "",
         factor: "either" as Factor,
         publicKey: accountAuthenticator.credentialPublicKey,
         prevCounter: accountAuthenticator.authCounter,

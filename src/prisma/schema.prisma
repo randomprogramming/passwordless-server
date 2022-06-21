@@ -38,6 +38,9 @@ model FidoOptions {
   rpName                          String?
   timeout                         Int                      @default(60000)
   createdAt                       DateTime                 @default(now())
+
+  origin String?
+  url    String?
 }
 
 // A client is a person who signs up at the head app. They recieve a private and public key which we use to recognize them.

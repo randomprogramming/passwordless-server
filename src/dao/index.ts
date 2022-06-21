@@ -177,6 +177,12 @@ class Dao {
       )?.client || null
     );
   }
+
+  public async findOriginByPrivateKey(privateKey: string) {
+    const client = await this.findClientByPrivateKey(privateKey);
+    if (!client) return null;
+    return client.fidoOptions.origin;
+  }
 }
 
 export default Dao;
