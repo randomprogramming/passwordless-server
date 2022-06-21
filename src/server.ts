@@ -47,6 +47,8 @@ class Server {
     this.mailPass = EnvParser.getString("MAILER_AUTH_PASSWORD", true);
     this.serverBaseUrl = EnvParser.getString("SERVER_BASE_URL", true);
 
+    console.log(`Read from env:\nauthPrivateKey:${this.authPrivateKey}\n`);
+
     this.dao = new Dao();
     this.fidoFactory = new FidoFactory(this.dao);
     this.mailClient = new MailClient(
